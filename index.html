@@ -1,15 +1,314 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>وِشْ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>وِشْ | WISH</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f1ea;
+      color: #171717;
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 22px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd6cc;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #171717;
+      margin-right: 25px;
+      font-size: 14px;
+    }
+
+    .hero {
+      min-height: 75vh;
+      padding: 80px 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+    }
+
+    .hero-text {
+      max-width: 650px;
+    }
+
+    .small {
+      font-size: 14px;
+      opacity: .6;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(55px, 9vw, 110px);
+      line-height: .95;
+      margin-bottom: 25px;
+      letter-spacing: -5px;
+    }
+
+    .hero p {
+      max-width: 500px;
+      font-size: 19px;
+      color: #555;
+      margin-bottom: 30px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 24px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: .2s;
+    }
+
+    .primary {
+      background: #171717;
+      color: white;
+    }
+
+    .secondary {
+      border: 1px solid #171717;
+      color: #171717;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .hero-box {
+      width: 320px;
+      height: 400px;
+      background: #ded5c8;
+      border-radius: 180px 180px 20px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 70px;
+      font-weight: bold;
+      transform: rotate(3deg);
+    }
+
+    section {
+      padding: 80px 7%;
+    }
+
+    .section-title {
+      font-size: 42px;
+      margin-bottom: 35px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      min-height: 220px;
+      border-radius: 22px;
+      border: 1px solid #e3ddd5;
+    }
+
+    .card span {
+      font-size: 35px;
+    }
+
+    .card h3 {
+      margin: 25px 0 10px;
+      font-size: 22px;
+    }
+
+    .card p {
+      color: #666;
+    }
+
+    .contact {
+      background: #171717;
+      color: white;
+      text-align: center;
+      border-radius: 35px;
+      margin: 30px 7%;
+      padding: 70px 30px;
+    }
+
+    .contact h2 {
+      font-size: 45px;
+      margin-bottom: 15px;
+    }
+
+    .contact p {
+      color: #bbb;
+      margin-bottom: 25px;
+    }
+
+    .contact a {
+      display: inline-block;
+      background: white;
+      color: #171717;
+      padding: 14px 28px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      padding: 35px;
+      color: #777;
+      font-size: 13px;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        padding: 18px 5%;
+      }
+
+      nav {
+        display: none;
+      }
+
+      .hero {
+        padding: 65px 5%;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .hero-box {
+        width: 100%;
+        height: 280px;
+      }
+
+      h1 {
+        font-size: 70px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 60px 5%;
+      }
+
+      .contact {
+        margin: 20px 5%;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-    <h1>هلا والله 👋</h1>
-    <h2>هذا وِشْ.</h2>
-    <p>خلّنا نوريك وش تسوي ✨</p>
+  <header>
+    <div class="logo">وِشْ</div>
+
+    <nav>
+      <a href="#services">خدماتنا</a>
+      <a href="#contact">تواصل معنا</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="hero-text">
+        <div class="small">هلا والله 👋</div>
+
+        <h1>وِشْ<br>نسوي لك؟</h1>
+
+        <p>
+          نصنع أفكار وتجارب تخلي حضورك مختلف.
+          من الفكرة إلى التنفيذ، نخلي كل تفصيلة لها معنى.
+        </p>
+
+        <div class="buttons">
+          <a class="btn primary" href="#services">وش نقدم؟</a>
+          <a class="btn secondary" href="#contact">تواصل معنا</a>
+        </div>
+      </div>
+
+      <div class="hero-box">
+        وِشْ
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="section-title">وش نسوي؟</div>
+
+      <div class="cards">
+
+        <div class="card">
+          <span>✦</span>
+          <h3>تصميم</h3>
+          <p>
+            نصمم لك هوية ومحتوى بصري يخلي علامتك تنعرف من أول نظرة.
+          </p>
+        </div>
+
+        <div class="card">
+          <span>◉</span>
+          <h3>محتوى</h3>
+          <p>
+            أفكار ومحتوى للسوشال ميديا بطريقة شبابية ومختلفة.
+          </p>
+        </div>
+
+        <div class="card">
+          <span>↗</span>
+          <h3>تجارب</h3>
+          <p>
+            نحول الأفكار إلى تجارب حقيقية تترك أثر عند العميل.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <h2>عندك فكرة؟</h2>
+
+      <p>
+        خلنا نسمعها منك.
+      </p>
+
+      <a href="https://wa.me/" target="_blank">
+        كلمنا
+      </a>
+    </section>
+
+  </main>
+
+  <footer>
+    © 2026 وِشْ — WISH
+  </footer>
 
 </body>
 </html>
