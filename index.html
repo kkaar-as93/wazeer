@@ -3,223 +3,466 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>وِشْ | WISH</title>
+
+  <title>وِشْ — نخلي مشروعك يُشاهد ويُتذكر</title>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f1ea;
+      font-family: "Cairo", sans-serif;
+      background: #f4f0e8;
       color: #171717;
-      line-height: 1.6;
+      overflow-x: hidden;
     }
 
+    /* ---------- HEADER ---------- */
+
     header {
-      padding: 22px 7%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      padding: 28px 6%;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #ddd6cc;
+      justify-content: space-between;
+      z-index: 10;
     }
 
     .logo {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: 1px;
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -2px;
+    }
+
+    .logo span {
+      font-weight: 400;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 30px;
     }
 
     nav a {
-      text-decoration: none;
       color: #171717;
-      margin-right: 25px;
+      text-decoration: none;
       font-size: 14px;
+      font-weight: 600;
+      opacity: .7;
+      transition: .25s;
     }
+
+    nav a:hover {
+      opacity: 1;
+    }
+
+    .client-login {
+      padding: 11px 19px;
+      border: 1px solid #171717;
+      border-radius: 100px;
+      opacity: 1;
+    }
+
+    /* ---------- HERO ---------- */
 
     .hero {
-      min-height: 75vh;
-      padding: 80px 7%;
+      min-height: 100vh;
+      padding: 150px 6% 80px;
+      position: relative;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 40px;
+      overflow: hidden;
     }
 
-    .hero-text {
-      max-width: 650px;
+    .hero-content {
+      width: 62%;
+      position: relative;
+      z-index: 2;
     }
 
-    .small {
-      font-size: 14px;
-      opacity: .6;
-      margin-bottom: 18px;
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 25px;
+      color: #666056;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      background: #171717;
+      border-radius: 50%;
     }
 
     h1 {
-      font-size: clamp(55px, 9vw, 110px);
-      line-height: .95;
-      margin-bottom: 25px;
-      letter-spacing: -5px;
+      font-size: clamp(58px, 8vw, 115px);
+      line-height: .98;
+      letter-spacing: -6px;
+      font-weight: 900;
+      max-width: 950px;
     }
 
-    .hero p {
-      max-width: 500px;
-      font-size: 19px;
-      color: #555;
-      margin-bottom: 30px;
+    h1 .outline {
+      color: transparent;
+      -webkit-text-stroke: 2px #171717;
     }
 
-    .buttons {
+    .hero-description {
+      margin-top: 32px;
+      max-width: 560px;
+      color: #625e57;
+      font-size: 18px;
+      line-height: 2;
+    }
+
+    .hero-buttons {
       display: flex;
       gap: 12px;
+      margin-top: 35px;
       flex-wrap: wrap;
     }
 
-    .btn {
-      padding: 14px 24px;
-      border-radius: 40px;
+    .button {
       text-decoration: none;
-      font-weight: bold;
-      transition: .2s;
+      padding: 15px 25px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 800;
+      transition: .3s;
     }
 
-    .primary {
+    .button-dark {
       background: #171717;
-      color: white;
+      color: #fff;
     }
 
-    .secondary {
-      border: 1px solid #171717;
+    .button-light {
+      border: 1px solid #aaa49b;
       color: #171717;
     }
 
-    .btn:hover {
-      transform: translateY(-3px);
+    .button:hover {
+      transform: translateY(-4px);
     }
 
-    .hero-box {
-      width: 320px;
-      height: 400px;
-      background: #ded5c8;
-      border-radius: 180px 180px 20px 20px;
+    /* ---------- HERO ART ---------- */
+
+    .hero-art {
+      position: absolute;
+      left: 4%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 370px;
+      height: 480px;
+    }
+
+    .shape-main {
+      position: absolute;
+      width: 290px;
+      height: 390px;
+      left: 30px;
+      top: 40px;
+      background: #1c1c1c;
+      border-radius: 160px 160px 30px 30px;
+      transform: rotate(-8deg);
+    }
+
+    .shape-inner {
+      position: absolute;
+      width: 170px;
+      height: 250px;
+      left: 90px;
+      top: 110px;
+      background: #d8d0c3;
+      border-radius: 100px 100px 15px 15px;
+      transform: rotate(10deg);
+    }
+
+    .shape-text {
+      position: absolute;
+      left: 95px;
+      top: 205px;
+      color: #fff;
+      font-size: 40px;
+      font-weight: 900;
+      transform: rotate(-8deg);
+      z-index: 3;
+    }
+
+    .floating {
+      position: absolute;
+      padding: 12px 17px;
+      background: #fff;
+      border: 1px solid #ddd7ce;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 15px 35px rgba(0,0,0,.07);
+    }
+
+    .floating.one {
+      top: 65px;
+      left: 0;
+      transform: rotate(-8deg);
+    }
+
+    .floating.two {
+      bottom: 70px;
+      right: 0;
+      transform: rotate(7deg);
+    }
+
+    /* ---------- BOTTOM ---------- */
+
+    .hero-bottom {
+      position: absolute;
+      bottom: 30px;
+      right: 6%;
+      left: 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #d5cec4;
+      padding-top: 17px;
+      color: #777168;
+      font-size: 12px;
+    }
+
+    .scroll {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 70px;
-      font-weight: bold;
-      transform: rotate(3deg);
+      gap: 10px;
     }
 
-    section {
-      padding: 80px 7%;
+    .arrow {
+      font-size: 18px;
     }
 
-    .section-title {
-      font-size: 42px;
-      margin-bottom: 35px;
-    }
+    /* ---------- SERVICES PREVIEW ---------- */
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
-
-    .card {
-      background: white;
-      padding: 30px;
-      min-height: 220px;
-      border-radius: 22px;
-      border: 1px solid #e3ddd5;
-    }
-
-    .card span {
-      font-size: 35px;
-    }
-
-    .card h3 {
-      margin: 25px 0 10px;
-      font-size: 22px;
-    }
-
-    .card p {
-      color: #666;
-    }
-
-    .contact {
+    .services-preview {
       background: #171717;
-      color: white;
-      text-align: center;
-      border-radius: 35px;
-      margin: 30px 7%;
-      padding: 70px 30px;
+      color: #fff;
+      padding: 110px 6%;
     }
 
-    .contact h2 {
-      font-size: 45px;
-      margin-bottom: 15px;
+    .services-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      align-items: end;
+      margin-bottom: 60px;
     }
 
-    .contact p {
-      color: #bbb;
-      margin-bottom: 25px;
+    .services-top h2 {
+      font-size: clamp(42px, 6vw, 75px);
+      line-height: 1;
+      letter-spacing: -3px;
     }
 
-    .contact a {
-      display: inline-block;
-      background: white;
-      color: #171717;
-      padding: 14px 28px;
-      border-radius: 40px;
-      text-decoration: none;
-      font-weight: bold;
+    .services-top p {
+      max-width: 370px;
+      color: #aaa;
+      line-height: 1.9;
+      font-size: 15px;
     }
 
-    footer {
-      text-align: center;
-      padding: 35px;
+    .service-list {
+      border-top: 1px solid #393939;
+    }
+
+    .service {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 25px 0;
+      border-bottom: 1px solid #393939;
+      transition: .3s;
+    }
+
+    .service:hover {
+      padding-right: 15px;
+    }
+
+    .service-number {
       color: #777;
       font-size: 13px;
     }
 
-    @media (max-width: 700px) {
+    .service-name {
+      font-size: 25px;
+      font-weight: 700;
+    }
+
+    .service-arrow {
+      font-size: 25px;
+      color: #888;
+    }
+
+    /* ---------- CTA ---------- */
+
+    .cta {
+      padding: 120px 6%;
+      text-align: center;
+      background: #d9d1c4;
+    }
+
+    .cta-small {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .cta h2 {
+      font-size: clamp(45px, 7vw, 90px);
+      line-height: 1;
+      letter-spacing: -4px;
+      margin-bottom: 30px;
+    }
+
+    .cta p {
+      color: #625e57;
+      margin: auto;
+      max-width: 500px;
+      line-height: 2;
+    }
+
+    .cta .button {
+      display: inline-block;
+      margin-top: 30px;
+    }
+
+    /* ---------- FOOTER ---------- */
+
+    footer {
+      background: #171717;
+      color: #fff;
+      padding: 35px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    footer .footer-logo {
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    footer span {
+      color: #777;
+    }
+
+    /* ---------- MOBILE ---------- */
+
+    @media (max-width: 850px) {
+
       header {
-        padding: 18px 5%;
+        padding: 22px 5%;
       }
 
-      nav {
+      nav a:not(.client-login) {
         display: none;
       }
 
       .hero {
-        padding: 65px 5%;
-        flex-direction: column;
-        align-items: flex-start;
+        padding: 130px 5% 100px;
+        min-height: auto;
       }
 
-      .hero-box {
+      .hero-content {
         width: 100%;
-        height: 280px;
       }
 
       h1 {
-        font-size: 70px;
+        font-size: clamp(55px, 16vw, 85px);
+        letter-spacing: -4px;
       }
 
-      .cards {
-        grid-template-columns: 1fr;
+      .hero-description {
+        font-size: 16px;
       }
 
-      section {
-        padding: 60px 5%;
+      .hero-art {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        width: 100%;
+        height: 300px;
+        margin-top: 60px;
       }
 
-      .contact {
-        margin: 20px 5%;
+      .shape-main {
+        width: 190px;
+        height: 260px;
+        left: 50%;
+        transform: translateX(-50%) rotate(-8deg);
+      }
+
+      .shape-inner {
+        width: 110px;
+        height: 165px;
+        left: calc(50% - 55px);
+        top: 75px;
+      }
+
+      .shape-text {
+        left: calc(50% - 38px);
+        top: 135px;
+        font-size: 27px;
+      }
+
+      .floating.one {
+        left: 15%;
+        top: 20px;
+      }
+
+      .floating.two {
+        right: 10%;
+        bottom: 15px;
+      }
+
+      .hero-bottom {
+        display: none;
+      }
+
+      .services-preview,
+      .cta {
+        padding: 80px 5%;
+      }
+
+      .services-top {
+        display: block;
+      }
+
+      .services-top p {
+        margin-top: 25px;
+      }
+
+      .service-name {
+        font-size: 19px;
+      }
+
+      footer {
+        padding: 30px 5%;
       }
     }
   </style>
@@ -228,86 +471,189 @@
 <body>
 
   <header>
-    <div class="logo">وِشْ</div>
+
+    <div class="logo">
+      وِش<span>ْ</span>
+    </div>
 
     <nav>
       <a href="#services">خدماتنا</a>
       <a href="#contact">تواصل معنا</a>
+      <a href="#" class="client-login">بوابة العميل</a>
     </nav>
+
   </header>
+
 
   <main>
 
     <section class="hero">
-      <div class="hero-text">
-        <div class="small">هلا والله 👋</div>
 
-        <h1>وِشْ<br>نسوي لك؟</h1>
+      <div class="hero-content">
 
-        <p>
-          نصنع أفكار وتجارب تخلي حضورك مختلف.
-          من الفكرة إلى التنفيذ، نخلي كل تفصيلة لها معنى.
+        <div class="eyebrow">
+          شريكك الإبداعي والتسويقي
+        </div>
+
+        <h1>
+          نخلي مشروعك
+          <br>
+          <span class="outline">يُشاهد.</span>
+          <br>
+          يُفهم. يُتذكر.
+        </h1>
+
+        <p class="hero-description">
+          من التصوير والتصميم إلى التسويق والمواقع،
+          نبني لك حضورًا احترافيًا يخلي مشروعك يظهر بالشكل اللي يستحقه.
         </p>
 
-        <div class="buttons">
-          <a class="btn primary" href="#services">وش نقدم؟</a>
-          <a class="btn secondary" href="#contact">تواصل معنا</a>
+        <div class="hero-buttons">
+
+          <a href="#contact" class="button button-dark">
+            ابدأ مشروعك ←
+          </a>
+
+          <a href="#services" class="button button-light">
+            اكتشف خدماتنا
+          </a>
+
         </div>
+
       </div>
 
-      <div class="hero-box">
-        وِشْ
+
+      <div class="hero-art">
+
+        <div class="shape-main"></div>
+
+        <div class="shape-inner"></div>
+
+        <div class="shape-text">
+          وِشْ
+        </div>
+
+        <div class="floating one">
+          فكرة → تنفيذ
+        </div>
+
+        <div class="floating two">
+          Design × Marketing
+        </div>
+
       </div>
+
+
+      <div class="hero-bottom">
+
+        <div>
+          نصمم حضورك، مو بس شكلك.
+        </div>
+
+        <div class="scroll">
+          انزل واكتشف
+          <span class="arrow">↓</span>
+        </div>
+
+      </div>
+
     </section>
 
-    <section id="services">
-      <div class="section-title">وش نسوي؟</div>
 
-      <div class="cards">
+    <section class="services-preview" id="services">
 
-        <div class="card">
-          <span>✦</span>
-          <h3>تصميم</h3>
-          <p>
-            نصمم لك هوية ومحتوى بصري يخلي علامتك تنعرف من أول نظرة.
-          </p>
+      <div class="services-top">
+
+        <h2>
+          وش نقدر<br>
+          نسوي لك؟
+        </h2>
+
+        <p>
+          حلول إبداعية وتسويقية مصممة حسب احتياج مشروعك،
+          من أول فكرة إلى ظهورها أمام عملائك.
+        </p>
+
+      </div>
+
+
+      <div class="service-list">
+
+        <div class="service">
+          <span class="service-number">01</span>
+          <span class="service-name">تصوير محلي</span>
+          <span class="service-arrow">↗</span>
         </div>
 
-        <div class="card">
-          <span>◉</span>
-          <h3>محتوى</h3>
-          <p>
-            أفكار ومحتوى للسوشال ميديا بطريقة شبابية ومختلفة.
-          </p>
+        <div class="service">
+          <span class="service-number">02</span>
+          <span class="service-name">هوية وشعار</span>
+          <span class="service-arrow">↗</span>
         </div>
 
-        <div class="card">
-          <span>↗</span>
-          <h3>تجارب</h3>
-          <p>
-            نحول الأفكار إلى تجارب حقيقية تترك أثر عند العميل.
-          </p>
+        <div class="service">
+          <span class="service-number">03</span>
+          <span class="service-name">تصميم ومحتوى</span>
+          <span class="service-arrow">↗</span>
+        </div>
+
+        <div class="service">
+          <span class="service-number">04</span>
+          <span class="service-name">فيديو ومونتاج</span>
+          <span class="service-arrow">↗</span>
+        </div>
+
+        <div class="service">
+          <span class="service-number">05</span>
+          <span class="service-name">خطط تسويقية</span>
+          <span class="service-arrow">↗</span>
+        </div>
+
+        <div class="service">
+          <span class="service-number">06</span>
+          <span class="service-name">مواقع ومنيو إلكتروني</span>
+          <span class="service-arrow">↗</span>
         </div>
 
       </div>
+
     </section>
 
-    <section class="contact" id="contact">
-      <h2>عندك فكرة؟</h2>
+
+    <section class="cta" id="contact">
+
+      <div class="cta-small">
+        عندك فكرة؟
+      </div>
+
+      <h2>
+        خلّنا نخليها<br>
+        وِشْ.
+      </h2>
 
       <p>
-        خلنا نسمعها منك.
+        قل لنا وش تحتاج، وإحنا نرتب لك الطريق من الفكرة إلى التنفيذ.
       </p>
 
-      <a href="https://wa.me/" target="_blank">
-        كلمنا
+      <a href="#" class="button button-dark">
+        تواصل معنا ←
       </a>
+
     </section>
 
   </main>
 
+
   <footer>
-    © 2026 وِشْ — WISH
+
+    <div class="footer-logo">
+      وِشْ
+    </div>
+
+    <span>
+      © 2026 وِشْ — كل شيء يبدأ بفكرة.
+    </span>
+
   </footer>
 
 </body>
