@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم — وِشْ</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- الشريط الجانبي (كمبيوتر) -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">وِشْ — إدارة</div>
+      <nav>
+        <a href="index.html" class="active">الرئيسية</a>
+        <a href="clients.html">العملاء</a>
+        <a href="#">الموظفين</a>
+        <a href="#">المشاريع</a>
+        <a href="#">المهام</a>
+      </nav>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main">
+
+      <div class="topbar">
+        <h1>الرئيسية</h1>
+        <span id="connectionStatus" class="status-badge">جارٍ فحص الاتصال...</span>
+      </div>
+
+      <div class="card">
+        <p>هذي لوحة التحكم الأساسية لنظام إدارة وِشْ. الأقسام (العملاء، الموظفين، المشاريع، المهام) بتنضاف تباعًا.</p>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- شريط تنقل سفلي (جوال) -->
+  <nav class="mobile-nav">
+    <a href="index.html" class="active">الرئيسية</a>
+    <a href="clients.html">العملاء</a>
+    <a href="#">الموظفين</a>
+    <a href="#">المشاريع</a>
+    <a href="#">المهام</a>
+  </nav>
+
+  <!-- مكتبة Supabase من CDN -->
+<!-- مكتبة Supabase من CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+
+<script>
+  // حماية صفحة المدير
+  (async () => {
+    const {
+      data: { user },
+      error: sessionError
+    } = await supabaseClient.auth.getUser();
+
+    // إذا ما فيه تسجيل دخول → صفحة الدخول
+    if (sessionError || !user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    // التأكد أن الحساب مدير
+    const { data: employee, error: employeeError } = await supabaseClient
+      .from("employees")
+      .select("name, email, role")
+      .eq("id", user.id)
+      .single();
+
+    if (employeeError || !employee || employee.role !== "manager") {
+      await supabaseClient.auth.signOut();
+      window.location.href = "login.html";
+      return;
+    }
+
+    // اختبار الاتصال بعد التأكد من الصلاحية
+    const badge = document.getElementById("connectionStatus");
+    const ok = await testSupabaseConnection();
+
+    if (ok) {
+      badge.textContent = "متصل بقاعدة البيانات ✅";
+      badge.classList.add("connected");
+    } else {
+      badge.textContent = "تعذر الاتصال ⚠️";
+      badge.classList.add("error");
+    }
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+/* ---------- نظام إدارة وزير — التصميم الأساسي ---------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Cairo", sans-serif;
+  background: #f4f0e8;
+  color: #171717;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- الشريط الجانبي ---------- */
+
+.sidebar {
+  width: 240px;
+  background: #171717;
+  color: #fff;
+  padding: 25px 20px;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 40px;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar nav a {
+  color: #ccc;
+  text-decoration: none;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: .2s;
+}
+
+.sidebar nav a:hover {
+  background: #262626;
+  color: #fff;
+}
+
+.sidebar nav a.active {
+  background: #fff;
+  color: #171717;
+}
+
+/* ---------- المحتوى الرئيسي ---------- */
+
+.main {
+  flex: 1;
+  padding: 30px 5%;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.topbar h1 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.status-badge {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 100px;
+  background: #e5e0d4;
+}
+
+.status-badge.connected {
+  background: #d7f2d7;
+  color: #1c6b1c;
+}
+
+.status-badge.error {
+  background: #f5d7d7;
+  color: #8b1c1c;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid #e5e0d4;
+}
+
+/* ---------- شريط جوال سفلي ---------- */
+
+.mobile-nav {
+  display: none;
+}
+
+/* ---------- الجوال ---------- */
+
+@media (max-width: 800px) {
+
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    padding: 20px 5% 90px;
+  }
+
+  .mobile-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: #171717;
+    padding: 12px 0;
+  }
+
+  .mobile-nav a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .mobile-nav a.active {
+    color: #fff;
+  }
+}
