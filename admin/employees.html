@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الموظفين — وِشْ</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <aside class="sidebar">
+      <div class="sidebar-logo">وِشْ — إدارة</div>
+
+      <nav>
+        <a href="index.html">الرئيسية</a>
+        <a href="clients.html">العملاء</a>
+        <a href="employees.html" class="active">الموظفين</a>
+        <a href="#">المشاريع</a>
+        <a href="#">المهام</a>
+      </nav>
+
+      <button id="logoutButton" type="button">تسجيل الخروج</button>
+    </aside>
+
+    <main class="main">
+
+      <div class="topbar">
+        <h1>الموظفين</h1>
+        <span id="connectionStatus" class="status-badge">
+          جارٍ التحميل...
+        </span>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <div>
+            <h2>قائمة الموظفين</h2>
+            <p>الموظفون المسجلون في نظام وِشْ.</p>
+          </div>
+
+          <button id="addEmployeeButton" type="button">
+            + إضافة موظف
+          </button>
+        </div>
+<div id="employeeForm" style="display:none; margin-top:20px;">
+  <h3>إضافة موظف جديد</h3>
+
+  <input id="employeeName" type="text" placeholder="اسم الموظف">
+
+  <input id="employeeEmail" type="email" placeholder="إيميل الموظف">
+
+  <input id="employeePassword" type="password" placeholder="كلمة المرور">
+
+  <select id="employeeRole">
+    <option value="employee">موظف</option>
+    <option value="manager">مدير</option>
+  </select>
+
+  <button id="saveEmployeeButton" type="button">
+    حفظ الموظف
+  </button>
+
+  <button id="cancelEmployeeButton" type="button">
+    إلغاء
+  </button>
+
+  <p id="employeeFormMessage"></p>
+</div>
+        <div id="employeesList" style="margin-top:20px;">
+          جارٍ تحميل الموظفين...
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <nav class="mobile-nav">
+    <a href="index.html">الرئيسية</a>
+    <a href="clients.html">العملاء</a>
+    <a href="employees.html" class="active">الموظفين</a>
+    <a href="#">المشاريع</a>
+    <a href="#">المهام</a>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+
+  <script>
+    async function checkManager() {
+      const {
+        data: { user },
+        error: sessionError
+      } = await supabaseClient.auth.getUser();
+
+      if (sessionError || !user) {
+        window.location.href = "login.html";
+        return false;
+      }
+
+      const { data: employee, error } = await supabaseClient
+        .from("employees")
+        .select("id, name, email, role")
+        .eq("id", user.id)
+        .single();
+
+      if (error || !employee || employee.role !== "manager") {
+        await supabaseClient.auth.signOut();
+        window.location.href = "login.html";
+        return false;
+      }
+
+      return true;
+    }
+
+    async function loadEmployees() {
+      const list = document.getElementById("employeesList");
+      const status = document.getElementById("connectionStatus");
+
+      const { data, error } = await supabaseClient
+        .from("employees")
+        .select("id, name, email, role, created_at")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        status.textContent = "تعذر التحميل ⚠️";
+        list.textContent = "تعذر تحميل الموظفين.";
+        return;
+      }
+
+      status.textContent = "متصل ✅";
+
+      if (!data || data.length === 0) {
+        list.textContent = "لا يوجد موظفون حتى الآن.";
+        return;
+      }
+
+      list.innerHTML = data.map(employee => `
+        <div class="card" style="margin-bottom:10px;">
+          <strong>${employee.name || "بدون اسم"}</strong>
+          <p>${employee.email || ""}</p>
+          <small>الصلاحية: ${employee.role}</small>
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = "login.html";
+    });
+
+const employeeForm = document.getElementById("employeeForm");
+const employeeFormMessage = document.getElementById("employeeFormMessage");
+
+document.getElementById("addEmployeeButton").addEventListener("click", () => {
+  employeeForm.style.display = "block";
+  employeeFormMessage.textContent = "";
+  document.getElementById("employeeName").focus();
+});
+
+document.getElementById("cancelEmployeeButton").addEventListener("click", () => {
+  employeeForm.style.display = "none";
+
+  document.getElementById("employeeName").value = "";
+  document.getElementById("employeeEmail").value = "";
+  document.getElementById("employeePassword").value = "";
+  document.getElementById("employeeRole").value = "employee";
+  employeeFormMessage.textContent = "";
+});
+
+document.getElementById("saveEmployeeButton").addEventListener("click", async () => {
+  const name = document.getElementById("employeeName").value.trim();
+  const email = document.getElementById("employeeEmail").value.trim();
+  const password = document.getElementById("employeePassword").value;
+  const role = document.getElementById("employeeRole").value;
+
+  if (!name || !email || !password) {
+    employeeFormMessage.textContent = "أكمل جميع البيانات المطلوبة.";
+    return;
+  }
+
+  if (password.length < 6) {
+    employeeFormMessage.textContent = "كلمة المرور يجب أن تكون 6 أحرف على الأقل.";
+    return;
+  }
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if (!session) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  employeeFormMessage.textContent = "جارٍ إنشاء الموظف...";
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/functions/v1/create-employee`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          role
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      employeeFormMessage.textContent =
+        result.error || "تعذر إنشاء الموظف.";
+      return;
+    }
+
+    employeeFormMessage.textContent = "تم إنشاء الموظف بنجاح ✅";
+
+    document.getElementById("employeeName").value = "";
+    document.getElementById("employeeEmail").value = "";
+    document.getElementById("employeePassword").value = "";
+    document.getElementById("employeeRole").value = "employee";
+
+    await loadEmployees();
+
+    setTimeout(() => {
+      employeeForm.style.display = "none";
+      employeeFormMessage.textContent = "";
+    }, 1000);
+
+  } catch (error) {
+    console.error(error);
+    employeeFormMessage.textContent =
+      "حدث خطأ أثناء الاتصال بالخادم.";
+  }
+});
+    (async () => {
+      const allowed = await checkManager();
+
+      if (allowed) {
+        await loadEmployees();
+      }
+    })();
+  </script>
+
+</body>
+</html>

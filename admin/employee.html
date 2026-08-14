@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة الموظف — وِشْ</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <aside class="sidebar">
+      <div class="sidebar-logo">وِشْ — الموظف</div>
+
+      <nav>
+        <a href="employee.html" class="active">الرئيسية</a>
+        <a href="#">مشاريعي</a>
+        <a href="#">مهامي</a>
+      </nav>
+
+      <button id="logoutButton" type="button">
+        تسجيل الخروج
+      </button>
+    </aside>
+
+    <main class="main">
+
+      <div class="topbar">
+        <div>
+          <h1>مرحبًا 👋</h1>
+          <p id="employeeName">جارٍ تحميل بياناتك...</p>
+        </div>
+
+        <span id="connectionStatus" class="status-badge">
+          جارٍ التحميل...
+        </span>
+      </div>
+
+     <div class="card">
+  <h2>مهامي</h2>
+
+  <div id="tasksList">
+    جارٍ تحميل المهام...
+  </div>
+</div>
+
+    </main>
+
+  </div>
+
+  <nav class="mobile-nav">
+    <a href="employee.html" class="active">الرئيسية</a>
+    <a href="#">مشاريعي</a>
+    <a href="#">مهامي</a>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+
+  <script>
+    async function checkEmployee() {
+
+      const {
+        data: { user },
+        error: userError
+      } = await supabaseClient.auth.getUser();
+
+      if (userError || !user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const {
+        data: employee,
+        error: employeeError
+      } = await supabaseClient
+        .from("employees")
+        .select("id, name, email, role")
+        .eq("id", user.id)
+        .single();
+
+      if (
+        employeeError ||
+        !employee ||
+        employee.role !== "employee"
+      ) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      document.getElementById("employeeName").textContent =
+        `أهلًا ${employee.name || "بك"} 👋`;
+
+      document.getElementById("connectionStatus").textContent =
+        "متصل ✅";
+
+      document
+        .getElementById("connectionStatus")
+        .classList.add("connected");
+    }
+async function loadTasks() {
+  const tasksList = document.getElementById("tasksList");
+
+  const {
+    data: { user },
+    error: userError
+  } = await supabaseClient.auth.getUser();
+
+  if (userError || !user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const { data: tasks, error } = await supabaseClient
+    .from("tasks")
+    .select("id, project_id, title, description, status, priority, due_date, created_at")
+    .eq("employee_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    tasksList.innerHTML = "<p>تعذر تحميل المهام.</p>";
+    return;
+  }
+
+  if (!tasks || tasks.length === 0) {
+    tasksList.innerHTML = "<p>ما عندك مهام حاليًا 🎉</p>";
+    return;
+  }
+
+  tasksList.innerHTML = tasks.map(task => `
+    <div class="card" style="margin-top:12px;">
+      <h3>${task.title || "بدون عنوان"}</h3>
+      <p>${task.description || "لا يوجد وصف."}</p>
+      <p><strong>الحالة:</strong> ${task.status || "غير محددة"}</p>
+      <p><strong>الأولوية:</strong> ${task.priority || "عادية"}</p>
+      <p><strong>موعد التسليم:</strong> ${task.due_date || "غير محدد"}</p>
+    </div>
+  `).join("");
+}
+    document
+      .getElementById("logoutButton")
+      .addEventListener("click", async () => {
+
+        await supabaseClient.auth.signOut();
+
+        window.location.href = "login.html";
+      });
+
+    checkEmployee();
+loadTasks();
+  </script>
+
+</body>
+</html>

@@ -14,12 +14,14 @@
     <aside class="sidebar">
       <div class="sidebar-logo">وِشْ — إدارة</div>
       <nav>
-        <a href="index.html" class="active">الرئيسية</a>
-        <a href="clients.html">العملاء</a>
-        <a href="#">الموظفين</a>
-        <a href="#">المشاريع</a>
-        <a href="#">المهام</a>
-      </nav>
+  <a href="index.html" class="active">الرئيسية</a>
+  <a href="clients.html">العملاء</a>
+  <a href="employees.html">الموظفين</a>
+  <a href="#">المشاريع</a>
+  <a href="#">المهام</a>
+</nav>
+
+<button id="logoutButton" type="button">تسجيل الخروج</button>
     </aside>
 
     <!-- المحتوى الرئيسي -->
@@ -30,22 +32,94 @@
         <span id="connectionStatus" class="status-badge">جارٍ فحص الاتصال...</span>
       </div>
 
-      <div class="card">
-        <p>هذي لوحة التحكم الأساسية لنظام إدارة وِشْ. الأقسام (العملاء، الموظفين، المشاريع، المهام) بتنضاف تباعًا.</p>
-      </div>
+     <div class="card">
+  <h2>المهام</h2>
+
+  <p>
+    من هنا تقدر تنشئ مهمة وتحدد الموظف والمشروع المسؤول عنها.
+  </p>
+
+  <button id="addTaskButton" type="button">
+    + إضافة مهمة
+  </button>
+
+  <div id="taskForm" style="display:none; margin-top:20px;">
+
+    <h3>إضافة مهمة جديدة</h3>
+
+    <label for="taskProject">المشروع</label>
+    <select id="taskProject">
+      <option value="">اختر المشروع</option>
+    </select>
+
+    <label for="taskEmployee">الموظف</label>
+    <select id="taskEmployee">
+      <option value="">اختر الموظف</option>
+    </select>
+
+    <label for="taskTitle">عنوان المهمة</label>
+    <input
+      id="taskTitle"
+      type="text"
+      placeholder="مثال: تصميم منشور"
+    >
+
+    <label for="taskDescription">الوصف</label>
+    <textarea
+      id="taskDescription"
+      placeholder="اكتب تفاصيل المهمة..."
+    ></textarea>
+
+    <label for="taskStatus">الحالة</label>
+    <select id="taskStatus">
+      <option value="new">جديدة</option>
+      <option value="in_progress">قيد التنفيذ</option>
+      <option value="review">مراجعة</option>
+      <option value="completed">مكتملة</option>
+    </select>
+
+    <label for="taskPriority">الأولوية</label>
+    <select id="taskPriority">
+      <option value="low">منخفضة</option>
+      <option value="medium">متوسطة</option>
+      <option value="high">عالية</option>
+    </select>
+
+    <label for="taskDueDate">موعد التسليم</label>
+    <input
+      id="taskDueDate"
+      type="date"
+    >
+
+    <br><br>
+
+    <button id="saveTaskButton" type="button">
+      حفظ المهمة
+    </button>
+
+    <button id="cancelTaskButton" type="button">
+      إلغاء
+    </button>
+
+    <p id="taskMessage"></p>
+
+  </div>
+</div>
 
     </main>
 
   </div>
 
   <!-- شريط تنقل سفلي (جوال) -->
-  <nav class="mobile-nav">
-    <a href="index.html" class="active">الرئيسية</a>
-    <a href="clients.html">العملاء</a>
-    <a href="#">الموظفين</a>
-    <a href="#">المشاريع</a>
-    <a href="#">المهام</a>
-  </nav>
+  <nav>
+  <a href="index.html" class="active">الرئيسية</a>
+  <a href="clients.html">العملاء</a>
+  <a href="employees.html">الموظفين</a>
+  <a href="#">المشاريع</a>
+  <a href="#">المهام</a>
+</nav>
+
+<button id="logoutButton" type="button">تسجيل الخروج</button>
 
   <!-- مكتبة Supabase من CDN -->
 <!-- مكتبة Supabase من CDN -->
@@ -92,6 +166,163 @@
     }
   })();
 </script>
+</script>
 
+  <script>
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+      const { error } = await supabaseClient.auth.signOut();
+
+      if (error) {
+        alert("تعذر تسجيل الخروج");
+        return;
+      }
+
+      window.location.href = "login.html";
+    });
+  </script>
+<script>
+  async function checkManagerAccess() {
+    const {
+      data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    const { data: employee, error } = await supabaseClient
+      .from("employees")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (error || !employee || employee.role !== "manager") {
+      await supabaseClient.auth.signOut();
+      window.location.href = "login.html";
+    }
+  }
+
+  checkManagerAccess();
+</script>
+<script>
+  async function loadTaskOptions() {
+    const projectSelect = document.getElementById("taskProject");
+    const employeeSelect = document.getElementById("taskEmployee");
+
+    // تحميل المشاريع
+    const { data: projects, error: projectsError } =
+      await supabaseClient
+        .from("projects")
+        .select("id, name")
+        .order("created_at", { ascending: false });
+
+    if (projectsError) {
+      console.error(projectsError);
+      return;
+    }
+
+    projectSelect.innerHTML =
+      '<option value="">اختر المشروع</option>';
+
+    projects.forEach(project => {
+      projectSelect.innerHTML += `
+        <option value="${project.id}">
+          ${project.name || "مشروع بدون اسم"}
+        </option>
+      `;
+    });
+
+    // تحميل الموظفين
+    const { data: employees, error: employeesError } =
+      await supabaseClient
+        .from("employees")
+        .select("id, name")
+        .eq("role", "employee")
+        .order("name");
+
+    if (employeesError) {
+      console.error(employeesError);
+      return;
+    }
+
+    employeeSelect.innerHTML =
+      '<option value="">اختر الموظف</option>';
+
+    employees.forEach(employee => {
+      employeeSelect.innerHTML += `
+        <option value="${employee.id}">
+          ${employee.name || "موظف بدون اسم"}
+        </option>
+      `;
+    });
+  }
+
+  document
+    .getElementById("addTaskButton")
+    .addEventListener("click", async () => {
+
+      const form = document.getElementById("taskForm");
+
+      form.style.display = "block";
+
+      await loadTaskOptions();
+    });
+document
+  .getElementById("saveTaskButton")
+  .addEventListener("click", async () => {
+
+    const projectId = document.getElementById("taskProject").value;
+    const employeeId = document.getElementById("taskEmployee").value;
+    const title = document.getElementById("taskTitle").value.trim();
+    const description = document.getElementById("taskDescription").value.trim();
+    const status = document.getElementById("taskStatus").value;
+    const priority = document.getElementById("taskPriority").value;
+    const dueDate = document.getElementById("taskDueDate").value;
+
+    const message = document.getElementById("taskMessage");
+
+    if (!projectId || !employeeId || !title) {
+      message.textContent = "اختر المشروع والموظف واكتب عنوان المهمة.";
+      return;
+    }
+
+    message.textContent = "جارٍ حفظ المهمة...";
+
+    const { error } = await supabaseClient
+      .from("tasks")
+      .insert({
+        project_id: projectId,
+        employee_id: employeeId,
+        title: title,
+        description: description || null,
+        status: status,
+        priority: priority,
+        due_date: dueDate || null
+      });
+
+    if (error) {
+  console.error("TASK ERROR:", error);
+  message.textContent = error.message || "تعذر حفظ المهمة.";
+  return;
+}
+
+    message.textContent = "تم إنشاء المهمة بنجاح ✅";
+
+    document.getElementById("taskTitle").value = "";
+    document.getElementById("taskDescription").value = "";
+    document.getElementById("taskDueDate").value = "";
+  });
+
+document
+  .getElementById("cancelTaskButton")
+  .addEventListener("click", () => {
+
+    document.getElementById("taskForm").style.display = "none";
+
+  });
+</script>
+</body>
+</html>
 </body>
 </html>
