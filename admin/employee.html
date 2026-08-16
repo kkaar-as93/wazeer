@@ -60,6 +60,30 @@
   <script src="js/supabase-client.js"></script>
 
   <script>
+    document.addEventListener("change", async (event) => {
+  if (!event.target.classList.contains("task-status")) {
+    return;
+  }
+
+  const select = event.target;
+  const taskId = select.dataset.taskId;
+  const newStatus = select.value;
+
+  const { error } = await supabaseClient
+    .from("tasks")
+    .update({
+      status: newStatus
+    })
+    .eq("id", taskId);
+
+  if (error) {
+    console.error("TASK STATUS ERROR:", error);
+    alert("تعذر تحديث حالة المهمة.");
+    return;
+  }
+
+  console.log("Task status updated successfully");
+});
     async function checkEmployee() {
 
       const {
@@ -134,7 +158,30 @@ async function loadTasks() {
     <div class="card" style="margin-top:12px;">
       <h3>${task.title || "بدون عنوان"}</h3>
       <p>${task.description || "لا يوجد وصف."}</p>
-      <p><strong>الحالة:</strong> ${task.status || "غير محددة"}</p>
+      <div style="margin-top:12px;">
+  <label>تغيير الحالة:</label>
+
+  <select
+    class="task-status"
+    data-task-id="${task.id}"
+  >
+    <option value="new" ${task.status === "new" ? "selected" : ""}>
+      جديدة
+    </option>
+
+    <option value="in_progress" ${task.status === "in_progress" ? "selected" : ""}>
+      قيد التنفيذ
+    </option>
+
+    <option value="review" ${task.status === "review" ? "selected" : ""}>
+      مراجعة
+    </option>
+
+    <option value="completed" ${task.status === "completed" ? "selected" : ""}>
+      مكتملة
+    </option>
+  </select>
+</div>
       <p><strong>الأولوية:</strong> ${task.priority || "عادية"}</p>
       <p><strong>موعد التسليم:</strong> ${task.due_date || "غير محدد"}</p>
     </div>
