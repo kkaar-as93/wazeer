@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المهام — وِشْ</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- الشريط الجانبي -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">وِشْ — إدارة</div>
+
+      <nav>
+        <a href="index.html">الرئيسية</a>
+        <a href="clients.html">العملاء</a>
+        <a href="employees.html">الموظفين</a>
+        <a href="#">المشاريع</a>
+        <a href="tasks.html" class="active">المهام</a>
+        <a href="archived-tasks.html">المؤرشفة</a>
+      </nav>
+
+      <button id="logoutButton" type="button">
+        تسجيل الخروج
+      </button>
+    </aside>
+
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main">
+
+      <div class="topbar">
+        <h1>المهام</h1>
+        <span id="connectionStatus" class="status-badge">
+          جارٍ فحص الاتصال...
+        </span>
+      </div>
+
+
+      <div class="card">
+
+        <h2>جميع المهام</h2>
+
+        <input
+  id="taskSearch"
+  type="text"
+  placeholder="ابحث عن مهمة..."
+  style="width:100%; margin-top:15px;"
+>
+<select
+  id="taskStatusFilter"
+  style="width:100%; margin-top:10px;"
+>
+  <option value="">كل الحالات</option>
+  <option value="new">جديدة</option>
+  <option value="in_progress">قيد التنفيذ</option>
+  <option value="review">مراجعة</option>
+  <option value="completed">مكتملة</option>
+</select>
+
+        <div id="tasksContainer">
+          جارٍ تحميل المهام...
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+
+
+  <script>
+
+    // حماية صفحة المدير
+    async function checkManagerAccess() {
+
+      const {
+        data: { user },
+        error: sessionError
+      } = await supabaseClient.auth.getUser();
+
+      if (sessionError || !user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+
+      const { data: employee, error } =
+        await supabaseClient
+          .from("employees")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+
+
+      if (error || !employee || employee.role !== "manager") {
+
+        await supabaseClient.auth.signOut();
+
+        window.location.href = "login.html";
+
+        return;
+      }
+
+
+      loadTasks();
+    }
+
+
+
+    // تحميل المهام
+    async function loadTasks() {
+
+      const container =
+        document.getElementById("tasksContainer");
+
+
+      const { data: tasks, error } =
+        await supabaseClient
+          .from("tasks")
+          .select(`
+            id,
+            title,
+            description,
+            status,
+            priority,
+            due_date,
+            created_at,
+            archived,
+            projects (
+              name
+            ),
+            employees (
+              name
+            ),
+            clients (
+              name
+            )
+          `)
+          .eq("archived", false)
+          .order("created_at", {
+            ascending: false
+          });
+
+
+      if (error) {
+
+        console.error("TASK LOAD ERROR:", error);
+
+        container.innerHTML =
+          `<p>تعذر تحميل المهام: ${error.message}</p>`;
+
+        return;
+      }
+
+
+      if (!tasks || tasks.length === 0) {
+
+        container.innerHTML =
+          "<p>لا توجد مهام حاليًا.</p>";
+
+        return;
+      }
+
+
+      container.innerHTML = "";
+
+
+      tasks.forEach(task => {
+
+        const card =
+          document.createElement("div");
+
+        card.className = "card";
+
+
+        card.style.marginTop = "15px";
+
+
+        card.innerHTML = `
+
+          <h3>
+            ${task.title || "مهمة بدون عنوان"}
+          </h3>
+
+          <p>
+            <strong>المشروع:</strong>
+            ${task.projects?.name || "غير محدد"}
+          </p>
+
+          <p>
+            <strong>الموظف:</strong>
+            ${task.employees?.name || "غير محدد"}
+          </p>
+
+          <p>
+            <strong>العميل:</strong>
+            ${task.clients?.name || "غير محدد"}
+          </p>
+
+          <p>
+            <strong>الوصف:</strong>
+            ${task.description || "لا يوجد وصف"}
+          </p>
+
+<label>
+  <strong>الحالة:</strong>
+</label>
+
+<select
+  class="task-status"
+  data-task-id="${task.id}"
+>
+  <option value="new" ${task.status === "new" ? "selected" : ""}>
+    جديدة
+  </option>
+
+  <option value="in_progress" ${task.status === "in_progress" ? "selected" : ""}>
+    قيد التنفيذ
+  </option>
+
+  <option value="review" ${task.status === "review" ? "selected" : ""}>
+    مراجعة
+  </option>
+
+  <option value="completed" ${task.status === "completed" ? "selected" : ""}>
+    مكتملة
+  </option>
+</select>
+
+          <p>
+            <strong>الأولوية:</strong>
+            ${task.priority || "غير محددة"}
+          </p>
+
+          <p>
+            <strong>موعد التسليم:</strong>
+            ${task.due_date || "غير محدد"}
+          </p>
+          
+          <button
+  class="archive-task"
+  data-task-id="${task.id}"
+  type="button"
+>
+  أرشفة المهمة
+</button>
+
+        `;
+
+
+        container.appendChild(card);
+
+      });
+
+    }
+
+function filterTasks() {
+
+  const search =
+    document.getElementById("taskSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const statusFilter =
+    document.getElementById("taskStatusFilter")
+      .value;
+
+  const cards =
+    document.querySelectorAll(
+      "#tasksContainer .card"
+    );
+
+  cards.forEach(card => {
+
+    const text =
+      card.textContent.toLowerCase();
+
+    const statusSelect =
+      card.querySelector(".task-status");
+
+    const taskStatus =
+      statusSelect
+        ? statusSelect.value
+        : "";
+
+    const matchesSearch =
+      text.includes(search);
+
+    const matchesStatus =
+      !statusFilter ||
+      taskStatus === statusFilter;
+
+    card.style.display =
+      matchesSearch && matchesStatus
+        ? ""
+        : "none";
+
+  });
+}
+
+
+document
+  .getElementById("taskSearch")
+  .addEventListener(
+    "input",
+    filterTasks
+  );
+
+
+document
+  .getElementById("taskStatusFilter")
+  .addEventListener(
+    "change",
+    filterTasks
+  );
+
+// تغيير حالة المهمة
+document.addEventListener("change", async (event) => {
+
+  if (!event.target.classList.contains("task-status")) {
+    return;
+  }
+
+  const select = event.target;
+  const taskId = select.dataset.taskId;
+  const newStatus = select.value;
+
+  const { error } = await supabaseClient
+    .from("tasks")
+    .update({
+      status: newStatus
+    })
+    .eq("id", taskId);
+
+  if (error) {
+    console.error("STATUS UPDATE ERROR:", error);
+    alert("تعذر تحديث حالة المهمة: " + error.message);
+    return;
+  }
+
+  console.log("تم تحديث حالة المهمة ✅");
+});
+// أرشفة المهمة
+document.addEventListener("click", async (event) => {
+
+
+  const button = event.target.closest(".archive-task");
+
+  if (!button) return;
+
+  const taskId = button.getAttribute("data-task-id");
+
+  if (!taskId) {
+    alert("رقم المهمة غير موجود");
+    return;
+  }
+
+  const confirmed = confirm("هل تريد أرشفة هذه المهمة؟");
+
+  if (!confirmed) return;
+
+  button.disabled = true;
+  button.textContent = "جارٍ الأرشفة...";
+
+  const result = await supabaseClient
+    .from("tasks")
+    .update({ archived: true })
+    .eq("id", taskId);
+
+  if (result.error) {
+
+    console.error(result.error);
+
+    alert("فشل الأرشفة: " + result.error.message);
+
+    button.disabled = false;
+    button.textContent = "أرشفة المهمة";
+
+    return;
+  }
+
+  // إزالة المهمة من الشاشة مباشرة
+  const card = button.closest(".card");
+
+  if (card) {
+    card.remove();
+  }
+
+});
+    // تسجيل الخروج
+    document
+      .getElementById("logoutButton")
+      .addEventListener("click", async () => {
+
+        const { error } =
+          await supabaseClient.auth.signOut();
+
+
+        if (error) {
+
+          alert("تعذر تسجيل الخروج");
+
+          return;
+        }
+
+
+        window.location.href = "login.html";
+
+      });
+
+
+    // تشغيل الصفحة
+    checkManagerAccess();
+
+  </script>
+
+</body>
+</html>

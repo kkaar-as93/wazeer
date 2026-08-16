@@ -18,7 +18,7 @@
   <a href="clients.html">العملاء</a>
   <a href="employees.html">الموظفين</a>
   <a href="#">المشاريع</a>
-  <a href="#">المهام</a>
+  <a href="tasks.html">المهام</a>
 </nav>
 
 <button id="logoutButton" type="button">تسجيل الخروج</button>
@@ -56,6 +56,11 @@
     <select id="taskEmployee">
       <option value="">اختر الموظف</option>
     </select>
+    
+    <label for="taskClient">العميل</label>
+<select id="taskClient">
+  <option value="">اختر العميل</option>
+</select>
 
     <label for="taskTitle">عنوان المهمة</label>
     <input
@@ -116,10 +121,11 @@
   <a href="clients.html">العملاء</a>
   <a href="employees.html">الموظفين</a>
   <a href="#">المشاريع</a>
-  <a href="#">المهام</a>
+  <a href="tasks.html">المهام</a>
 </nav>
 
 <button id="logoutButton" type="button">تسجيل الخروج</button>
+
 
   <!-- مكتبة Supabase من CDN -->
 <!-- مكتبة Supabase من CDN -->
@@ -166,7 +172,6 @@
     }
   })();
 </script>
-</script>
 
   <script>
     document.getElementById("logoutButton").addEventListener("click", async () => {
@@ -209,6 +214,8 @@
   async function loadTaskOptions() {
     const projectSelect = document.getElementById("taskProject");
     const employeeSelect = document.getElementById("taskEmployee");
+    const clientSelect = document.getElementById("taskClient");
+    
 
     // تحميل المشاريع
     const { data: projects, error: projectsError } =
@@ -256,6 +263,28 @@
         </option>
       `;
     });
+    // تحميل العملاء
+const { data: clients, error: clientsError } =
+  await supabaseClient
+    .from("clients")
+    .select("id, name")
+    .order("name");
+
+if (clientsError) {
+  console.error(clientsError);
+  return;
+}
+
+clientSelect.innerHTML =
+  '<option value="">اختر العميل</option>';
+
+clients.forEach(client => {
+  clientSelect.innerHTML += `
+    <option value="${client.id}">
+      ${client.name || "عميل بدون اسم"}
+    </option>
+  `;
+});
   }
 
   document
@@ -273,13 +302,13 @@ document
   .addEventListener("click", async () => {
 
     const projectId = document.getElementById("taskProject").value;
+    const clientId = document.getElementById("taskClient").value;
     const employeeId = document.getElementById("taskEmployee").value;
     const title = document.getElementById("taskTitle").value.trim();
     const description = document.getElementById("taskDescription").value.trim();
     const status = document.getElementById("taskStatus").value;
     const priority = document.getElementById("taskPriority").value;
     const dueDate = document.getElementById("taskDueDate").value;
-
     const message = document.getElementById("taskMessage");
 
     if (!projectId || !employeeId || !title) {
@@ -293,6 +322,7 @@ document
       .from("tasks")
       .insert({
         project_id: projectId,
+        client_id: clientId || null,
         employee_id: employeeId,
         title: title,
         description: description || null,
@@ -322,7 +352,34 @@ document
 
   });
 </script>
-</body>
-</html>
+<script>
+async function addClient() {
+    const name = prompt("اسم العميل:");
+    if (!name || !name.trim()) return;
+
+    const email = prompt("البريد الإلكتروني (اختياري):") || "";
+    const phone = prompt("رقم الجوال (اختياري):") || "";
+
+    const { data, error } = await supabase
+        .from("clients")
+        .insert([
+            {
+                name: name.trim(),
+                email: email.trim(),
+                phone: phone.trim()
+            }
+        ])
+        .select();
+
+    if (error) {
+        console.error(error);
+        alert("حدث خطأ: " + error.message);
+        return;
+    }
+
+    alert("تمت إضافة العميل بنجاح ✅");
+    location.reload();
+}
+</script>
 </body>
 </html>

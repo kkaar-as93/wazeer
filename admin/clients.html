@@ -32,6 +32,7 @@
         <span id="connectionStatus" class="status-badge">
           جارٍ فحص الاتصال...
         </span>
+      <button onclick="addClient()">+ إضافة عميل</button>
       </div>
 
       <div class="card">
@@ -162,5 +163,32 @@
 
   </script>
 
+  <script>
+async function addClient() {
+    const name = prompt("اسم العميل:");
+    if (!name || !name.trim()) return;
+
+    const email = prompt("البريد الإلكتروني (اختياري):") || "";
+    const phone = prompt("رقم الجوال (اختياري):") || "";
+
+    const { error } = await supabaseClient
+        .from("clients")
+        .insert({
+            name: name.trim(),
+            email: email.trim(),
+            phone: phone.trim()
+        });
+
+    if (error) {
+        alert("تعذر إضافة العميل: " + error.message);
+        console.error(error);
+        return;
+    }
+
+    alert("تمت إضافة العميل بنجاح ✅");
+    
+}
+loadClients();
+</script>
 </body>
 </html>
